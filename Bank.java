@@ -29,8 +29,30 @@ public class Bank {
   public int getN() {
     return n;
   }
+  /*
+  prints contents of available to sysout
+   */
+  public void displayAvalilable(){
+    System.out.print("Contents of Available: ");
+    for (int i = 0; i < m; i++){
+      System.out.printf("%d ", available[i]);
+    }
+    System.out.println();
+  }
 
-  // build arrays and matrices
+  /*
+  prints contents of allocation to sysout
+   */
+  public void displayAllocation(){
+    System.out.print("Contents of Allocation: ");
+    for (int i = 0; i < m; i++){
+      System.out.println();
+      for (int j = 0; j < n; j++) {
+        System.out.printf("%d ", allocation[i][j]);
+      }
+    }
+    System.out.println();
+  }
 
   /*
   populates the available array with m integers read from input
@@ -39,20 +61,34 @@ public class Bank {
     available = new int[m];
 
     for (int i = 0; i < m; i++){
-      System.out.printf("Resource %d: ", i);
+      System.out.printf("> Resource %d: ", i);
         if (input.hasNextInt()) {
           //accept integer
           available[i] = input.nextInt();
-          System.out.println();
         }
 
     }
   }
+  /*
+  populates the allocation matrix
+   */
+  private void buildAllocation(Scanner input) {
+    allocation = new int[m][n];
+
+    // accept m rows of integers as strings
+    for (int i = 0; i < m; i++){
+      System.out.printf("> allocation[%d]: ", i);
+      for (int j = 0; j < n; j++){
+        allocation[i][j] = input.nextInt();
+      }
+    }
+
+  }
 
   public static void main(String[] args){
     Bank myBank = new Bank();
-    int m;
-    int n;
+    int m = 1;
+    int n = 1;
 
     Scanner input = new Scanner(System.in);
     boolean validInput = false;
@@ -86,10 +122,18 @@ public class Bank {
       }
     }
 
-    // populate maximum
-    System.out.printf("Enter the available amount for all %d resources in your Bank:\n", myBank.getM());
+    // populate available
+    System.out.printf("Enter the available amount for all M = %d resources in your Bank:\n", myBank.getM());
     myBank.buildAvailable(input);
+    myBank.displayAvalilable();
 
+    // populate allocation
+    System.out.printf("For each of the N = %d lines, enter the number of " +
+    "instances allocated for each of the M = %d resources:\n", n, m);
+    myBank.buildAllocation(input);
+    myBank.displayAllocation();
     } // end main method
-    
-  }
+
+
+
+}
