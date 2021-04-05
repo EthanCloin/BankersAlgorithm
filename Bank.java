@@ -67,17 +67,15 @@ public class Bank {
   prints contents of available to sysout
    */
   private void displayAvailable(){
-    System.out.print("Contents of Available: ");
-    for (int i = 0; i < m; i++){
-      System.out.printf("%d ", available[i]);
-    }
+    System.out.print("Available Vector: ");
+    displayVector(available);
     System.out.println();
   }
 
   /*
   prints contents of work to sysout
    */
-  private void displayVector(int[] vector){
+  private static void displayVector(int[] vector){
     System.out.print("[ ");
     int len = vector.length;
     for (int i = 0; i < len; i++){
@@ -90,12 +88,11 @@ public class Bank {
   prints contents of allocation to sysout
    */
   private void displayAllocation(){
-
+    System.out.println("Allocation Matrix:");
     for (int i = 0; i < n; i++){
+      System.out.printf("Allocation[%d] : ", i);
+      displayVector(allocation[i]);
       System.out.println();
-      for (int j = 0; j < m; j++) {
-        System.out.printf("%d ", allocation[i][j]);
-      }
     }
     System.out.println();
   }
@@ -118,14 +115,12 @@ public class Bank {
   prints contents of need to sysout
    */
   private void displayNeed(){
-    System.out.print("Contents of Need: ");
+    System.out.println("Need Matrix: ");
     for (int i = 0; i < n; i++){
+      System.out.printf("Need[%d] : ", i);
+      displayVector(need[i]);
       System.out.println();
-      for (int j = 0; j < m; j++) {
-        System.out.printf("%d ", need[i][j]);
-      }
     }
-    System.out.println();
   }
 
   /*
@@ -212,14 +207,22 @@ returns index of first false finish, or -1 for all true
       // if false, continue loop
       if (!finish[i]) {
         current = i;
+        System.out.println("Safe state not reached!!!");
+        System.out.println("Going back through finish vector, starting at index 0");
         return current;
       }
       if (i == n-1 && finish[i]){
         return -1;
       }
     }
+
     return current;
   }
+
+
+  /*
+  Determines whether the system is currently in a safe state
+   */
   private int[] safetyAlgorithm(){
     // initialize finish array to false
     buildFinish();
@@ -227,13 +230,23 @@ returns index of first false finish, or -1 for all true
     int[] work = available.clone();
     // initialize current value
     int current = 0;
-
     // initialize to track order
     int[] processOrder = new int[n];
     int successCounter = 0;
+    System.out.println("\n====================================================================");
+    System.out.print("---------------------");
+    System.out.print("Beginning Safety Algorithm");
+    System.out.print("---------------------");
+
+
+
+    /*
+    This loop will continue attempting to allocate resources limited by
+    maxRetries counter. Returns the process order upon confirming safe state or
+    -1 upon failure to find a safe process order
+     */
 
     while (true) {
-
       // display customer number, work, and need
       System.out.println("\nCustomer: " + current);
       System.out.printf("A: finish[%d] = %b\n",current, finish[current]);
@@ -243,13 +256,11 @@ returns index of first false finish, or -1 for all true
         System.out.printf("\tneed[%d] = ", current);
         displayVector(need[current]);
         System.out.printf("; work = ");
-        displayVector(work);
       }else{
         System.out.printf("work = ");
-        displayVector(work);
       }
+      displayVector(work);
       System.out.println();
-
 
       if (!finish[current]) {
         // check whether need is <= work
@@ -282,7 +293,7 @@ returns index of first false finish, or -1 for all true
         current = checkFinish(finish, current);
         retryCount++;
 
-        if (retryCount == maxRetries) {
+        if (retryCount >= maxRetries) {
           System.out.println("Unable to process request!");
           int[] fail = new int[]{-1};
           return fail;
@@ -301,7 +312,6 @@ returns index of first false finish, or -1 for all true
   private void updateWork(boolean[] finish, int[] work, int current) {
     for (int i = 0; i < m; i++) {
       work[i] += allocation[current][i];
-      allocation[current][i] = 0;
     }
     System.out.printf("finish[%d] is now = %b\n", current, finish[current]);
     System.out.printf("work is now = ");
@@ -311,83 +321,174 @@ returns index of first false finish, or -1 for all true
 
   public static void main(String[] args){
     Bank myBank = new Bank();
-//    int m = 1;
-//    int n = 1;
-//
-//    Scanner input = new Scanner(System.in);
-//    boolean validInput = false;
-//
-//    // Prompt user for valid N Value
-//    while(!validInput) {
-//      System.out.println("Enter the number of customers (N):");
-//      if (input.hasNextInt()){
-//        n = input.nextInt();
-//        System.out.printf("> N: %d", n);
-//        myBank.setN(n);
-//        validInput = true;
-//      }else {
-//        System.out.println("Please enter a valid integer!");
-//        input.next();
-//      }
-//    }
-//    validInput = false;
-//    System.out.println();
-//    // Prompt user for valid M Value
-//    while(!validInput) {
-//      System.out.println("Enter the number of resources (M): ");
-//      if (input.hasNextInt()){
-//        m = input.nextInt();
-//        System.out.printf("> M: %d\n", m);
-//        myBank.setM(m);
-//        validInput = true;
-//      }else {
-//        System.out.println("Please enter a valid integer!");
-//        input.next();
-//      }
-//    }
-//
-//    // populate available
-//    System.out.printf("Enter the maximum available amount for all M = %d resources in your Bank:\n", myBank.getM());
-//
-//    int[] maxAvailable = new int[m];
-//
-//    for (int i = 0; i < m; i++){
-//      System.out.printf("> Resource %d: ", i);
-//      if (input.hasNextInt()) {
-//        //accept integer
-//        maxAvailable[i] = input.nextInt();
-//      }
-//    }
-//
-//    // populate allocation
-//    System.out.printf("Enter M = %d values for resources allocated to each of the %d customers:\n", m, n);
-//    myBank.buildAllocation(input);
-//
-//    // populate maximum
-//    System.out.printf("Enter M = %d values for the maximum demand on each of the resources\n", m);
-//    myBank.buildMaximum(input);
-//
-//    // populate availability
-//    myBank.buildAvailable(maxAvailable);
-//
-//    // populate need
-//    myBank.buildNeed();
-//    myBank.displayNeed();
-//
-//
-//    myBank.safetyAlgorithm();
+    //myBank.test();
 
+    Scanner input = new Scanner(System.in);
+    myBank.buildN(input);
+    myBank.buildM(input);
 
+    int n = myBank.getN();
+    int m = myBank.getM();
 
-    myBank.test();
+    // populate available
+    System.out.printf("Enter the maximum available amount for all M = %d resources in your Bank:\n", m);
+    int[] maxAvailable = myBank.getMaxAvailableFromUser(input);
+
+    // populate allocation
+    System.out.printf("Enter M = %d values for resources allocated to each of the %d customers:\n", m, n);
+    myBank.buildAllocation(input);
+
+    // populate maximum
+    System.out.printf("Enter M = %d values for the maximum demand on each of the resources\n", m);
+    myBank.buildMaximum(input);
+
+    // populate availability vector
+    myBank.buildAvailable(maxAvailable);
+
+    // populate need matrix
+    myBank.buildNeed();
+
+    // display status per provided output
+    myBank.displayAllocation();
+    myBank.displayNeed();
+    myBank.displayAvailable();
+
+    // execute safety check
+    int[] safeSequence = myBank.safetyAlgorithm();
+
+    // display result or exit on failure
+    if (safeSequence.length > 1){
+      System.out.print("Safe Sequence: ");
+      displayVector(safeSequence);
+      System.out.println();
+    }
+    else {
+      System.out.println("System is not in a safe state!");
+      System.exit(-1);
+    }
+
+    // display status per provided output
+    myBank.displayAllocation();
+    myBank.displayNeed();
+    myBank.displayAvailable();
+
+    boolean running = true;
+    // attempt to execute requests until user enters 'n'
+    while(running) {
+      // receive info for request
+      int customerNumber = myBank.getCustomerNumberFromUser(input);
+      int[] request = myBank.buildRequest(input);
+
+      boolean success = myBank.resourceRequest(customerNumber, request);
+
+      if (success) {
+        System.out.println("Would you like to make another request? Y/N");
+
+        String response = input.next();
+        response = response.toLowerCase();
+
+        if (response.contains("y")) {
+          // loop
+          continue;
+        } else if (response.contains("n")) {
+          // break
+          running = false;
+        }
+
+      }
+    }
+
 
     } // end main method
+
+  private int getCustomerNumberFromUser(Scanner input) {
+
+    int num;
+    // Prompt user for valid M Value
+    while(true) {
+      System.out.println("Enter the number of the customer making a request: ");
+      if (input.hasNextInt()){
+        num = input.nextInt();
+        System.out.printf("> customer number: %d\n", num);
+        return num;
+      }else {
+        System.out.println("Please enter a valid integer!");
+        input.next();
+      }
+    }
+
+  }
+
+  private int[] buildRequest(Scanner input) {
+    int[] request = new int[m];
+
+    for (int i = 0; i < m; i++){
+      System.out.printf("> Request from resource %d: ", i);
+      if (input.hasNextInt()) {
+        //accept integer
+        request[i] = input.nextInt();
+      }
+    }
+    System.out.print("Received Request for: "); displayVector(request);
+    return request;
+  }
+
+  private int[] getMaxAvailableFromUser(Scanner input) {
+
+    int[] maxAvailable = new int[m];
+
+    for (int i = 0; i < m; i++){
+      System.out.printf("> Resource %d: ", i);
+      if (input.hasNextInt()) {
+        //accept integer
+        maxAvailable[i] = input.nextInt();
+      }
+    }
+    return maxAvailable;
+  }
+
+  private void buildM(Scanner input) {
+    boolean validInput = false;
+    int num;
+    // Prompt user for valid M Value
+    while(!validInput) {
+      System.out.print("Enter the number of resources (M): ");
+      if (input.hasNextInt()){
+        num = input.nextInt();
+        System.out.printf("> M: %d\n", num);
+        setM(num);
+        validInput = true;
+      }else {
+        System.out.println("Please enter a valid integer!");
+        input.next();
+      }
+    }
+  }
+
+  private void buildN(Scanner input) {
+    boolean validInput = false;
+
+    // Prompt user for valid N Value
+    int num;
+    while(!validInput) {
+      System.out.print("Enter the number of customers (N): ");
+      if (input.hasNextInt()){
+        num = input.nextInt();
+        System.out.printf("> N: %d\n", num);
+        setN(num);
+        validInput = true;
+      }else {
+        System.out.println("Please enter a valid integer!");
+        input.next();
+      }
+    }
+  }
 
   /*
   receives a customerNumber and array representing resource request, and returns
   true if the request is valid
    */
-  private void resourceRequest(int customerNumber, int[] resourcesRequested) {
+  private boolean resourceRequest(int customerNumber, int[] resourcesRequested) {
     // ensure that the provided request is within the limits of customer's
     // maximum needs
 
@@ -397,21 +498,37 @@ returns index of first false finish, or -1 for all true
       int[] oldAllocation = allocation[customerNumber].clone();
       int[] oldNeed = need[customerNumber].clone();
 
+
       for (int i = 0; i < available.length; i++){
         available[i] -= resourcesRequested[i];
         allocation[customerNumber][i] += resourcesRequested[i];
         need[customerNumber][i] -= resourcesRequested[i];
       }
 
-      System.out.println("\nUpdated Allocation Matrix:"); displayAllocation();
-      System.out.println("\nUpdated Need Matrix: "); displayNeed();
-      System.out.println("\nUpdated Available Vector: "); displayAvailable();
+      // if not a safe state replace with original values
+      if (safetyAlgorithm().length <= 1){
+        for (int i = 0; i < available.length; i++){
+          available[i] = oldAvailable[i];
+          allocation[customerNumber][i] = oldAllocation[i];
+          need[customerNumber][i] = oldNeed[i];
+        }
+        System.out.println("Invalid Request!");
+        return false;
+      }
+      else {
+        System.out.printf("Request from customer %d for resources ", customerNumber); displayVector(resourcesRequested);
+        System.out.printf(" can be granted!\n");
 
-
+        displayAllocation();
+        displayNeed();
+        displayAvailable();
+        return true;
+      }
 
     }else {
       System.out.println("Invalid Request!");
-      System.exit(-1);
+      // add reprompt for different request
+      return false;
     }
 
   }
