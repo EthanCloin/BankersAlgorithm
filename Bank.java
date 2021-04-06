@@ -396,6 +396,12 @@ returns index of first false finish, or -1 for all true
         }
 
       }
+      else {
+        // show that values haven't changed
+        myBank.displayNeed();
+        myBank.displayAllocation();
+        myBank.displayAvailable();
+      }
     }
 
 
